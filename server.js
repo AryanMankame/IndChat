@@ -7,6 +7,24 @@ const router = express.Router();
 const userAuth = require('./authRouter')
 const mongoose = require('mongoose')
 const messageRouter = require('./messages')
+
+// socket part
+const server = app.listen(process.env.PORT || 3002,() => {
+    console.log("Listening carefully...");
+})
+
+const socket = require('socket.io')
+const io = socket(server,{
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
+})
+io.on('connection',socket => {
+    console.log('connected with => ',socket.id)
+})
+
+
 // middleware
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
@@ -26,9 +44,7 @@ router.get('/new',(req,res) => {
 app.use('/auth',userAuth);
 
 //listening on a particular port
-app.listen(process.env.PORT || 3001,() => {
-    console.log("Listening carefully...");
-})
+
 app.post('/new',(req,res) => {
     let p = new Person({
         name:req.body["name"],
