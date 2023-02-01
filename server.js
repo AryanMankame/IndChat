@@ -12,7 +12,7 @@ const messageRouter = require('./messages')
 const server = app.listen(process.env.PORT || 3002,() => {
     console.log("Listening carefully...");
 })
-
+var virtdata = []
 const socket = require('socket.io')
 const io = socket(server,{
     cors: {
@@ -22,8 +22,13 @@ const io = socket(server,{
 })
 io.on('connection',socket => {
     console.log('connected with => ',socket.id)
-})
+    socket.on("check",(data) => {
+        virtdata.push(data)
+        console.log(data)
+        socket.broadcast.emit('new_inserted',data)
+    })
 
+})
 
 // middleware
 app.use(bodyParser.json())
