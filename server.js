@@ -6,8 +6,8 @@ const cors = require('cors');
 const router = express.Router();
 const userAuth = require('./authRouter')
 const mongoose = require('mongoose')
-const messageRouter = require('./messages')
-
+const messageRouter = require('./messagesdb')
+const socketid = {}
 // socket part
 const server = app.listen(process.env.PORT || 3002,() => {
     console.log("Listening carefully...");
@@ -21,13 +21,14 @@ const io = socket(server,{
     }
 })
 io.on('connection',socket => {
-    console.log('connected with => ',socket.id)
+    console.log('connected with => ',socket.id,' ',socket.handshake.query.loggeduser)
+    socketid[socket.id] = socket.handshake.query.loggeduser;
     socket.on("check",(data) => {
         virtdata.push(data)
         console.log(data)
         socket.broadcast.emit('new_inserted',data)
     })
-
+    socket.emit("checkme",socketid)
 })
 
 // middleware
